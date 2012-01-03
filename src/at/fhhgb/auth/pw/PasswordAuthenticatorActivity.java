@@ -2,6 +2,7 @@ package at.fhhgb.auth.pw;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Application;
 import android.app.AlertDialog.Builder;
 import android.content.DialogInterface;
 import android.database.Cursor;
