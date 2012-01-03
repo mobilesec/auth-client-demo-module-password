@@ -2,7 +2,6 @@ package at.fhhgb.auth.pw;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.Application;
 import android.app.AlertDialog.Builder;
 import android.content.DialogInterface;
 import android.database.Cursor;
@@ -77,7 +76,8 @@ public class PasswordAuthenticatorActivity extends Activity implements OnClickLi
 			Toast.makeText(this, "No corresponding user found", Toast.LENGTH_SHORT).show();
 		} 
 		
-		String savedPassword = c.getString(c.getColumnIndex(Feature.REPRESENTATION));
+		// TODO continue here with no existing user features
+		String savedPassword = c.getString(c.getColumnIndexOrThrow(Feature.REPRESENTATION));
 		
 		String title;
 		String message;
