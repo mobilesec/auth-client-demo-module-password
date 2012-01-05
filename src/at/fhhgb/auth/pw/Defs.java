@@ -15,7 +15,7 @@
 package at.fhhgb.auth.pw;
 
 import android.content.ContentValues;
-import at.fhhgb.auth.intent.IntentIntegrator.AuthModes;
+import at.fhhgb.auth.lib.intent.IntentIntegrator.AuthModes;
 import at.fhhgb.auth.provider.AuthDb.Mode;
 
 /**
