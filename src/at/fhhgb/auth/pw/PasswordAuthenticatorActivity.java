@@ -27,6 +27,10 @@ public class PasswordAuthenticatorActivity extends Activity implements OnClickLi
         setContentView(R.layout.main);
         
         userUri = getIntent().getData();
+        if (userUri == null) {
+        	finish();
+        	return;
+        }
         setupUi();
     }
 
@@ -40,6 +44,13 @@ public class PasswordAuthenticatorActivity extends Activity implements OnClickLi
 		
 		okBtn.setOnClickListener(this);
 		
+		fillNameFields(claimedName);
+	}
+
+	/**
+	 * @param claimedName
+	 */
+	private void fillNameFields(TextView claimedName) {
 		Cursor cursor = managedQuery(userUri, null, null, null, null);
 		if (cursor.moveToFirst()) {
 			String firstName = cursor.getString(cursor.getColumnIndex(Subject.FIRST_NAME));
@@ -62,9 +73,6 @@ public class PasswordAuthenticatorActivity extends Activity implements OnClickLi
 		}
 	}
 
-	/**
-	 * 
-	 */
 	private void checkPassword() {
 		String enteredPassword = editPw.getText().toString();
 		// query the provider for saved passwords for this user
@@ -76,7 +84,6 @@ public class PasswordAuthenticatorActivity extends Activity implements OnClickLi
 			Toast.makeText(this, "No corresponding user found", Toast.LENGTH_SHORT).show();
 		} 
 		
-		// TODO continue here with no existing user features
 		String savedPassword = c.getString(c.getColumnIndexOrThrow(Feature.REPRESENTATION));
 		
 		String title;
