@@ -23,6 +23,10 @@
             <intent-filter >
                 <action android:name="at.fhhgb.auth.intent.AUTH_METHOD" />
             </intent-filter>
+            
+            <intent-filter>
+                <action android:name="at.fhhgb.auth.intent.DO_AUTH.password"/>
+            </intent-filter>
 
                 <!-- 
                  -->

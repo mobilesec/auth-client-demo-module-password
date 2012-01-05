@@ -15,6 +15,7 @@
 package at.fhhgb.auth.pw;
 
 import android.content.ContentValues;
+import at.fhhgb.auth.intent.IntentIntegrator.AuthModes;
 import at.fhhgb.auth.provider.AuthDb.Mode;
 
 /**
@@ -23,8 +24,8 @@ import at.fhhgb.auth.provider.AuthDb.Mode;
  */
 public final class Defs {
 
-	public static final String MODE_TYPE = "password";
-	public static final String UNIQUE_NAME = "PasswordAuthenticator";
+	public static final String MODE_TYPE = AuthModes.PASSWORD;
+	public static final String UNIQUE_NAME = "at.fhhgb.auth.pw.PasswordAuthenticator";
 	public static final String DISPLAY_NAME = "Simple Password Authentication";
 	
 	public static ContentValues DEFAULT_CONTENT_VALUES;
@@ -34,5 +35,7 @@ public final class Defs {
 		DEFAULT_CONTENT_VALUES.put(Mode.NAME, UNIQUE_NAME);
 		DEFAULT_CONTENT_VALUES.put(Mode.TYPE, MODE_TYPE);
 		DEFAULT_CONTENT_VALUES.put(Mode.DISPLAY_NAME, DISPLAY_NAME);
+		DEFAULT_CONTENT_VALUES.put(Mode.PACKAGE_NAME, "at.fhhgb.auth.pw");
+		DEFAULT_CONTENT_VALUES.put(Mode.CLASS_NAME, ".PasswordAuthenticatorActivity");
 	}
 }
