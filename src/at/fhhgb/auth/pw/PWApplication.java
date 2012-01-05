@@ -15,7 +15,12 @@
 package at.fhhgb.auth.pw;
 
 import android.app.Application;
+import android.content.ContentUris;
+import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.net.Uri;
+import android.preference.PreferenceManager;
+import android.util.Log;
 import at.fhhgb.auth.provider.AuthDb.Mode;
 
 /**
@@ -23,13 +28,25 @@ import at.fhhgb.auth.provider.AuthDb.Mode;
  *
  */
 public class PWApplication extends Application {
+	private static final String TAG = "PWAuth";
 	
+	private static final String PREF_KEY_MODE_ID = "modeId";
+
 	@Override
 	public void onCreate() {
 		super.onCreate();
 		initAuthMethod();
 	}
-
+	
+	/**
+	 * Returns the unique ID of this authentication mode that was returned when 
+	 * this authentication mode was first inserted into the database.
+	 * @return
+	 */
+	public long getModeId() {
+		return PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getLong(PREF_KEY_MODE_ID, -1);
+	}
+	
 	private void initAuthMethod() {
 		if (!pwAuthMethodExists()) {
 			createAuthMethod();
@@ -37,7 +54,12 @@ public class PWApplication extends Application {
 	}
 
 	private void createAuthMethod() {
-		getContentResolver().insert(Mode.CONTENT_URI, Defs.DEFAULT_CONTENT_VALUES);
+		Log.d(TAG, "Creating auth method with values: " + Defs.DEFAULT_CONTENT_VALUES.toString());
+		Uri insertedUri = getContentResolver().insert(Mode.CONTENT_URI, Defs.DEFAULT_CONTENT_VALUES);
+		long modeId = ContentUris.parseId(insertedUri);
+		Log.v(TAG, "Storing modeId in preferences: " + modeId);
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+		prefs.edit().putLong(PREF_KEY_MODE_ID, modeId).commit();
 	}
 
 	private boolean pwAuthMethodExists() {

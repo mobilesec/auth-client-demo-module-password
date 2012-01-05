@@ -3,7 +3,9 @@ package at.fhhgb.auth.pw;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
+import android.content.ContentUris;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -13,6 +15,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+import at.fhhgb.auth.lib.intent.IntentIntegrator.Extras;
+import at.fhhgb.auth.lib.util.UIUtils;
 import at.fhhgb.auth.provider.AuthDb.Feature;
 import at.fhhgb.auth.provider.AuthDb.Subject;
 
@@ -27,12 +31,71 @@ public class PasswordAuthenticatorActivity extends Activity implements OnClickLi
         setContentView(R.layout.main);
         
         userUri = getIntent().getData();
+        
+        // this just for testing
         if (userUri == null) {
         	finish();
-        	return;
-        }
-        setupUi();
+			return;
+		}
+		if (!checkUserStillExists()) {
+			UIUtils.showErrorDialog(
+					this,
+					"User deleted",
+					"The requested user does not exist anymore, authentication will not be possible!",
+					new DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							finish();
+						}
+					});
+			return;
+		}
+        checkFeaturesExist();
     }
+
+	private boolean checkUserStillExists() {
+		Cursor c = managedQuery(userUri, null, null, null, null);
+		return c.getCount() > 0;
+	}
+
+	private void checkFeaturesExist() {
+		Uri featuresUri = Feature.buildFeaturesForSubjectUri(ContentUris.parseId(userUri));
+		Cursor c = managedQuery(featuresUri, null, null, null, null);
+		if (c.getCount() == 0) {
+			askToCreatePassword();
+		} else {
+			setupUi();
+		}
+	}
+
+	private void askToCreatePassword() {
+		AlertDialog.Builder builder = new Builder(this);
+		builder.setTitle("No password");
+		builder.setMessage("No password for this user yet, do you want to create one now?");
+		builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				Intent intent = new Intent(Intent.ACTION_INSERT, Feature.CONTENT_URI);
+				intent.putExtra(Extras.EXTRA_USER_ID, ContentUris.parseId(userUri));
+				
+				startActivity(intent);
+				finish();
+			}
+		});
+		builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				finish();
+			}
+		});
+		builder.setOnCancelListener(new DialogInterface.OnCancelListener() {
+			@Override
+			public void onCancel(DialogInterface dialog) {
+				finish();
+			}
+		});
+		builder.show();
+	}
 
 	/**
 	 * Loads user info from the content resolver and sets up button listener.
