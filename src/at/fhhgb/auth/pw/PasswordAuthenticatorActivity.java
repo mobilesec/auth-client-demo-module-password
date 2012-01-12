@@ -4,13 +4,16 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
 import android.content.ContentUris;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -129,14 +132,45 @@ public class PasswordAuthenticatorActivity extends Activity implements OnClickLi
 	public void onClick(View v) {
 		switch (v.getId()) {
 		case R.id.btn_ok:
-			checkPassword();
+			hideKeypad();
+			checkResults();
 			break;
 		default:
 			break;
 		}
 	}
 
-	private void checkPassword() {
+	private void hideKeypad() {
+		IBinder windowToken = editPw.getWindowToken();
+		InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+		imm.hideSoftInputFromWindow(windowToken, 0);
+	}
+
+	private void checkResults() {
+		if (checkPassword()) {
+			returnSuccess();
+		} else {
+			returnFailure();
+		}
+	}
+
+	private void returnFailure() {
+		Intent resultIntent = new Intent();
+		resultIntent.putExtra(Extras.EXTRA_RESULT, false);
+		resultIntent.putExtra(Extras.EXTRA_RESULT_CONFIDENCE, 0.0d);
+		setResult(RESULT_OK, resultIntent);
+		finish();
+	}
+
+	private void returnSuccess() {
+		Intent resultIntent = new Intent();
+		resultIntent.putExtra(Extras.EXTRA_RESULT, true);
+		resultIntent.putExtra(Extras.EXTRA_RESULT_CONFIDENCE, 1.0d);
+		setResult(RESULT_OK, resultIntent);
+		finish();
+	}
+
+	private boolean checkPassword() {
 		String enteredPassword = editPw.getText().toString();
 		// query the provider for saved passwords for this user
 		int userId = Integer.parseInt(userUri.getLastPathSegment());
@@ -149,25 +183,6 @@ public class PasswordAuthenticatorActivity extends Activity implements OnClickLi
 		
 		String savedPassword = c.getString(c.getColumnIndexOrThrow(Feature.REPRESENTATION));
 		
-		String title;
-		String message;
-		if (enteredPassword.equals(savedPassword)) {
-			title = "Password OK";
-			message = "You entered the correct password";
-		} else {
-			title = "Password WRONG";
-			message = "You entered the wrong password";
-		}
-		
-		AlertDialog.Builder builder = new Builder(this);
-		builder.setIcon(android.R.drawable.ic_dialog_alert);
-		builder.setTitle(title);
-		builder.setMessage(message);
-		builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-			}
-		});
-		builder.show();
+		return enteredPassword.equals(savedPassword);
 	}
 }
