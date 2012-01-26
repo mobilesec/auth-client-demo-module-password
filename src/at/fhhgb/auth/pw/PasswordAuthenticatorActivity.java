@@ -26,6 +26,7 @@ import at.fhhgb.auth.provider.AuthDb.Subject;
 public class PasswordAuthenticatorActivity extends Activity implements OnClickListener {
     private Uri userUri;
 	private EditText editPw;
+	private long modeId;
 
 	/** Called when the activity is first created. */
     @Override
@@ -53,6 +54,7 @@ public class PasswordAuthenticatorActivity extends Activity implements OnClickLi
 					});
 			return;
 		}
+		modeId = ((PWApplication)getApplication()).getModeId();
         checkFeaturesExist();
     }
 
@@ -62,7 +64,7 @@ public class PasswordAuthenticatorActivity extends Activity implements OnClickLi
 	}
 
 	private void checkFeaturesExist() {
-		Uri featuresUri = Feature.buildFeaturesForSubjectUri(ContentUris.parseId(userUri));
+		Uri featuresUri = Feature.buildFeaturesForSubjectAndMode(ContentUris.parseId(userUri), modeId);
 		Cursor c = managedQuery(featuresUri, null, null, null, null);
 		if (c.getCount() == 0) {
 			askToCreatePassword();
@@ -78,7 +80,7 @@ public class PasswordAuthenticatorActivity extends Activity implements OnClickLi
 		builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
-				Intent intent = new Intent(Intent.ACTION_INSERT, Feature.CONTENT_URI);
+				Intent intent = new Intent(PasswordAuthenticatorActivity.this, CreatePassword.class);
 				intent.putExtra(Extras.EXTRA_USER_ID, ContentUris.parseId(userUri));
 				
 				startActivity(intent);
@@ -173,8 +175,8 @@ public class PasswordAuthenticatorActivity extends Activity implements OnClickLi
 	private boolean checkPassword() {
 		String enteredPassword = editPw.getText().toString();
 		// query the provider for saved passwords for this user
-		int userId = Integer.parseInt(userUri.getLastPathSegment());
-		Uri uri = Feature.buildFeaturesForSubjectUri(userId);
+		long userId = ContentUris.parseId(userUri);
+		Uri uri = Feature.buildFeaturesForSubjectAndMode(userId, modeId);
 		
 		Cursor c = managedQuery(uri, null, null, null, null);  
 		if (!c.moveToFirst()) {
