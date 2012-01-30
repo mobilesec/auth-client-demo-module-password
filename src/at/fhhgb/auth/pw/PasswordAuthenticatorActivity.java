@@ -23,6 +23,12 @@ import at.fhhgb.auth.lib.util.UIUtils;
 import at.fhhgb.auth.provider.AuthDb.Feature;
 import at.fhhgb.auth.provider.AuthDb.Subject;
 
+/** 
+ * Verifies the entered password for the user with the saved one, or 
+ * redirects to the password creation activity if no password exists yet.
+ * @author thomaskaiser
+ *
+ */
 public class PasswordAuthenticatorActivity extends Activity implements OnClickListener {
     private Uri userUri;
 	private EditText editPw;
@@ -58,11 +64,13 @@ public class PasswordAuthenticatorActivity extends Activity implements OnClickLi
         checkFeaturesExist();
     }
 
+    /** The user may not exist anymore if anything happened to the database. */
 	private boolean checkUserStillExists() {
 		Cursor c = managedQuery(userUri, null, null, null, null);
 		return c.getCount() > 0;
 	}
 
+	/** Checkfs if we have a saved password. */
 	private void checkFeaturesExist() {
 		Uri featuresUri = Feature.buildFeaturesForSubjectAndMode(ContentUris.parseId(userUri), modeId);
 		Cursor c = managedQuery(featuresUri, null, null, null, null);
@@ -172,6 +180,7 @@ public class PasswordAuthenticatorActivity extends Activity implements OnClickLi
 		finish();
 	}
 
+	/** Checks if the entered password equals the saved ones. */
 	private boolean checkPassword() {
 		String enteredPassword = editPw.getText().toString();
 		// query the provider for saved passwords for this user

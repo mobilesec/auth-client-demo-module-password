@@ -27,6 +27,12 @@ import android.widget.Toast;
 import at.fhhgb.auth.lib.intent.IntentIntegrator.Extras;
 import at.fhhgb.auth.provider.AuthDb.Feature;
 
+/**
+ * Lets the user create a password, if none exists yet. 
+ * No constraints except the passwords have to be equal.
+ * @author thomaskaiser
+ *
+ */
 public class CreatePassword extends Activity {
 	
 	private static final String TAG = "PWAuth";

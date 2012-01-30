@@ -19,10 +19,11 @@ import at.fhhgb.auth.lib.intent.IntentIntegrator.AuthModes;
 import at.fhhgb.auth.provider.AuthDb.Mode;
 
 /**
+ * Some content value definitions for initializing database.
  * @author thomaskaiser
  *
  */
-public final class Defs {
+public final class ContentValueDefaults {
 
 	public static final String MODE_TYPE = AuthModes.PASSWORD;
 	public static final String UNIQUE_NAME = "at.fhhgb.auth.pw.PasswordAuthenticator";
